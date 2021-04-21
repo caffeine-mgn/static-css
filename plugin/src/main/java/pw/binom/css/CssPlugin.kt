@@ -5,6 +5,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.DependencyResolutionListener
 import org.gradle.api.artifacts.ResolvableDependencies
+import org.gradle.api.internal.file.FileCollectionFactory
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -51,6 +52,12 @@ open class GenerateCss : JavaExec() {
         mainClass.set("pw.binom.css.GeneratedMain")
         argumentProviders += CommandLineArgumentProvider { arrayListOf(outputCss.asFile.get().absolutePath) }
     }
+
+    override fun exec() {
+        classpath += project.configurations.getByName("compileClasspath")
+        super.exec()
+    }
+
 }
 
 open class GenerateMain : DefaultTask() {

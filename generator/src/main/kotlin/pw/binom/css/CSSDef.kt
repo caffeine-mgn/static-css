@@ -14,6 +14,13 @@ open class CSSDef(val name: String, val parent: CSSDef?, val then: Boolean) {
     var display by CssProperty()
     var backgroundColor by CssProperty()
     var background by CssProperty()
+    var visibility by CssProperty()
+    var animation by CssProperty()
+    var marginRight by CssProperty()
+    var marginLeft by CssProperty()
+    var marginTop by CssProperty()
+    var marginBottom by CssProperty()
+    var borderRadius by CssProperty()
     var width by CssProperty()
     var height by CssProperty()
     var cursor by CssProperty()
@@ -25,7 +32,6 @@ open class CSSDef(val name: String, val parent: CSSDef?, val then: Boolean) {
     var fontFamily by CssProperty()
     var color by CssProperty()
     var fontSize by CssProperty()
-    var marginTop by CssProperty()
     var fontWeight by CssProperty()
     var verticalAlign by CssProperty()
     var textAlign by CssProperty()
@@ -36,6 +42,8 @@ open class CSSDef(val name: String, val parent: CSSDef?, val then: Boolean) {
     var padding by CssProperty()
     var transitionTimingFunction by CssProperty()
     var overflow by CssProperty()
+    var overflowX by CssProperty()
+    var overflowY by CssProperty()
 
     operator fun String.compareTo(f: CSSDef.() -> Unit): Int {
         style(this, true, f)
@@ -47,7 +55,7 @@ open class CSSDef(val name: String, val parent: CSSDef?, val then: Boolean) {
         return 0
     }
 
-    fun buildSelfPath(): String {
+    internal open fun buildSelfPath(): String {
         if (parent == null)
             return name
 
@@ -58,7 +66,10 @@ open class CSSDef(val name: String, val parent: CSSDef?, val then: Boolean) {
         return sb.toString()
     }
 
-    fun buildSelf(sb: Appendable) {
+    internal open fun buildSelf(sb: Appendable, keyframes: Boolean) {
+        if (keyframes) {
+            sb.append("@keyframes ")
+        }
         sb.append(buildSelfPath()).append(" {\n")
         fields.forEach {
             sb.append("\t${convertKey(it.key)}: ${it.value};\n")
@@ -66,7 +77,7 @@ open class CSSDef(val name: String, val parent: CSSDef?, val then: Boolean) {
         sb.append("}\n")
     }
 
-    fun convertKey(key: String): String {
+    internal fun convertKey(key: String): String {
         val out = StringBuilder()
         for (i in 0..key.length - 1) {
             val c = key[i]
@@ -80,11 +91,11 @@ open class CSSDef(val name: String, val parent: CSSDef?, val then: Boolean) {
         return out.toString()
     }
 
-    fun buildRecursive(sb: Appendable) {
-        buildSelf(sb)
+    internal open fun buildRecursive(sb: Appendable, keyframes: Boolean) {
+        buildSelf(sb, keyframes)
 
         childs.forEach {
-            it.buildSelf(sb)
+            it.buildSelf(sb, keyframes)
         }
     }
 }
