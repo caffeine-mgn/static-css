@@ -44,6 +44,8 @@ open class CSSDef(val name: String, val parent: CSSDef?, val then: Boolean) {
     var overflow by CssProperty()
     var overflowX by CssProperty()
     var overflowY by CssProperty()
+    var whiteSpace by CssProperty()
+    var zIndex by CssProperty()
 
     operator fun String.compareTo(f: CSSDef.() -> Unit): Int {
         style(this, true, f)
