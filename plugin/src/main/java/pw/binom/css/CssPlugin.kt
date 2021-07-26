@@ -1,11 +1,11 @@
 package pw.binom.css
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.DependencyResolutionListener
 import org.gradle.api.artifacts.ResolvableDependencies
-import org.gradle.api.internal.file.FileCollectionFactory
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -14,12 +14,21 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 open class CssPlugin : Plugin<Project> {
+
+    fun findRuntimeClasspath(target: Project)=
+        when {
+            "runtime" in target.configurations.names -> target.configurations.getAt("runtime")
+            "runtimeClasspath" in target.configurations.names -> target.configurations.getAt("runtimeClasspath")
+            else -> throw GradleException("Can't find runtime configuration")
+        }
+
     override fun apply(target: Project) {
         target.pluginManager.apply("kotlin-platform-jvm")
         target.gradle.addListener(object : DependencyResolutionListener {
             override fun beforeResolve(dependencies: ResolvableDependencies) {
-                target.configurations.getAt("runtime").dependencies.add(target.dependencies.create("org.jetbrains.kotlin:kotlin-stdlib:1.4.30"))
-                target.configurations.getAt("runtime").dependencies.add(target.dependencies.create("pw.binom.static-css:generator:0.1.28"))
+                val config = findRuntimeClasspath(target)
+                config.dependencies.add(target.dependencies.create("org.jetbrains.kotlin:kotlin-stdlib:1.5.20"))
+                config.dependencies.add(target.dependencies.create("pw.binom.static-css:generator:0.1.28"))
                 target.dependencies.add("api", target.dependencies.create("pw.binom.static-css:generator:0.1.28"))
                 target.gradle.removeListener(this)
             }
@@ -38,14 +47,15 @@ open class CssPlugin : Plugin<Project> {
         val generateCss = target.tasks.register("buildCss", GenerateCss::class.java)
         generateCss.get().dependsOn(compileKotlin)
         generateCss.get().outputCss.set(target.buildDir.resolve("css/${target.name}.css"))
-        generateCss.get().classpath = compileKotlin.outputs.files + target.configurations.getAt("runtime")
+        val runtimeClasspath = findRuntimeClasspath(target)
+        generateCss.get().classpath = compileKotlin.outputs.files + runtimeClasspath
     }
 }
 
 open class GenerateCss : JavaExec() {
 
     @OutputFile
-    var outputCss = project.objects.fileProperty()
+    val outputCss = project.objects.fileProperty()
 
     init {
         group = "build"
@@ -62,7 +72,7 @@ open class GenerateCss : JavaExec() {
 
 open class GenerateMain : DefaultTask() {
     @OutputFile
-    internal var mainFile = project.objects.fileProperty()
+    val mainFile = project.objects.fileProperty()
 
     init {
         group = "build"
