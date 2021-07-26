@@ -2,9 +2,10 @@ package pw.binom.css
 
 import kotlin.reflect.KProperty
 
-open class CSSDef(val name: String, val parent: CSSDef?, val then: Boolean) {
-    val fields = HashMap<String, String>()
+open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSDef?, val then: Boolean) {
+    val fields = LinkedHashMap<String, String>()
     val childs = ArrayList<CSSDef>()
+    val extended = ArrayList<CSSDef>()
 
     var position by CssProperty()
     var left by CssProperty()
@@ -13,6 +14,10 @@ open class CSSDef(val name: String, val parent: CSSDef?, val then: Boolean) {
     var bottom by CssProperty()
     var display by CssProperty()
     var backgroundColor by CssProperty()
+    var borderBottom by CssProperty()
+    var boxShadow by CssProperty()
+    var transition by CssProperty()
+    var borderBottomColor by CssProperty()
     var background by CssProperty()
     var visibility by CssProperty()
     var animation by CssProperty()
@@ -24,6 +29,7 @@ open class CSSDef(val name: String, val parent: CSSDef?, val then: Boolean) {
     var borderRadius by CssProperty()
     var width by CssProperty()
     var height by CssProperty()
+    var textDecoration by CssProperty()
     var cursor by CssProperty()
     var transitionDuration by CssProperty()
     var transitionProperty by CssProperty()
@@ -34,15 +40,18 @@ open class CSSDef(val name: String, val parent: CSSDef?, val then: Boolean) {
     var color by CssProperty()
     var fontSize by CssProperty()
     var fontWeight by CssProperty()
+    var opacity by CssProperty()
     var verticalAlign by CssProperty()
     var textAlign by CssProperty()
     var backgroundRepeat by CssProperty()
     var backgroundPosition by CssProperty()
     var border by CssProperty()
     var outline by CssProperty()
+    var maxHeight by CssProperty()
     var padding by CssProperty()
     var paddingLeft by CssProperty()
     var minWidth by CssProperty()
+    var content by CssProperty(wrap = '\'')
     var minHeight by CssProperty()
     var paddingRight by CssProperty()
     var paddingTop by CssProperty()
@@ -57,21 +66,28 @@ open class CSSDef(val name: String, val parent: CSSDef?, val then: Boolean) {
     var stroke by CssProperty()
     var strokeWidth by CssProperty()
 
+    init {
+        extends.forEach {
+            it.extended += this
+        }
+    }
+
     operator fun String.compareTo(f: CSSDef.() -> Unit): Int {
-        style(this, true, f)
+        style(this, extends = emptyArray(), true, f)
         return 0
     }
 
-    operator fun String.invoke(f: CSSDef.() -> Unit): Int {
-        style(this, false, f)
+    operator fun String.invoke(vararg extends: CSSDef, f: CSSDef.() -> Unit): Int {
+        style(this, extends = extends, then = false, f)
         return 0
     }
 
     internal open fun buildSelfPath(): String {
-        if (parent == null)
-            return name
+        if (parent == null) {
+            return (listOf(name) + extended.map { it.name }).joinToString(", ")
+        }
 
-        val sb = StringBuilder(parent.buildSelfPath())
+        val sb = StringBuilder(parent!!.buildSelfPath())
         if (!then)
             sb.append(" ")
         sb.append(name)
@@ -79,6 +95,9 @@ open class CSSDef(val name: String, val parent: CSSDef?, val then: Boolean) {
     }
 
     internal open fun buildSelf(sb: Appendable, keyframes: Boolean) {
+        if (fields.isEmpty()) {
+            return
+        }
         if (keyframes) {
             sb.append("@keyframes ")
         }
@@ -105,9 +124,10 @@ open class CSSDef(val name: String, val parent: CSSDef?, val then: Boolean) {
 
     internal open fun buildRecursive(sb: Appendable, keyframes: Boolean) {
         buildSelf(sb, keyframes)
-
-        childs.forEach {
-            it.buildSelf(sb, keyframes)
+        if (childs.isNotEmpty()) {
+            childs.forEach {
+                it.buildRecursive(sb, keyframes)
+            }
         }
     }
 }
@@ -124,8 +144,8 @@ inline fun <T, R> ThreadLocal<T>.swap(value: T, f: () -> R): R {
     }
 }
 
-fun style(name: String, then: Boolean = false, f: CSSDef.() -> Unit): CSSDef {
-    val def = CSSDef(name, current.get(), then)
+fun style(name: String, extends: Array<out CSSDef>, then: Boolean = false, f: CSSDef.() -> Unit): CSSDef {
+    val def = CSSDef(name = name, extends = extends, parent = current.get(), then = then)
     current.get()?.childs?.let { it.add(def) }
     current.swap(def) {
         def.f()
@@ -134,8 +154,26 @@ fun style(name: String, then: Boolean = false, f: CSSDef.() -> Unit): CSSDef {
     return def
 }
 
-class CssProperty(vararg val also: String) {
-    operator fun getValue(thisRef: CSSDef, property: KProperty<*>): String? = thisRef.fields[property.name]
+class CssProperty(vararg val also: String, val wrap: Char? = null) {
+    operator fun getValue(thisRef: CSSDef, property: KProperty<*>): String? {
+        val value = thisRef.fields[property.name] ?: return null
+        return if (wrap != null) {
+            val sb = StringBuilder()
+            var i = 1
+            while (i < value.length - 2) {
+                val c = value[i]
+                if (c == '\\') {
+                    i++
+                    continue
+                }
+                sb.append(c)
+            }
+            sb.toString()
+        } else {
+            value
+        }
+    }
+
     operator fun setValue(thisRef: CSSDef, property: KProperty<*>, value: String?) {
         if (value == null) {
             thisRef.fields.remove(property.name)
@@ -143,9 +181,23 @@ class CssProperty(vararg val also: String) {
                 thisRef.fields.remove(it)
             }
         } else {
-            thisRef.fields[property.name] = value
+            val resultValue = if (wrap != null) {
+                val sb = StringBuffer()
+                sb.append(wrap)
+                value.forEach {
+                    if (it == wrap) {
+                        sb.append('\\')
+                    }
+                    sb.append(it)
+                }
+                sb.append(wrap)
+                sb.toString()
+            } else {
+                value
+            }
+            thisRef.fields[property.name] = resultValue
             also.forEach {
-                thisRef.fields[it] = value
+                thisRef.fields[it] = resultValue
             }
         }
     }
