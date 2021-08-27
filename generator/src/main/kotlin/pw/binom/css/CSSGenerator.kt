@@ -1,11 +1,5 @@
 package pw.binom.css
 
-//fun CSS(function: CSSDefinition): CSSBlock {
-//    val block = CSSBlock()
-//    block.function()
-//    return block
-//}
-
 object CSS {
     operator fun invoke(function: CSSDefinition): CSSBlock {
         val block = CSSBlock()
@@ -69,18 +63,4 @@ class CSSBlock {
         }
         return this
     }
-
 }
-//val example = CSS {
-//    keyframes("OLOLO") {
-//        this.on(100) {
-//            display = "none"
-//        }
-//    }
-//}
-//
-//fun main() {
-//    val sb = StringBuilder()
-//    example.buildRecursive(sb)
-//    println(sb)
-//}

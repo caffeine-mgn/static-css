@@ -101,18 +101,23 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
         if (keyframes) {
             sb.append("@keyframes ")
         }
-        sb.append(buildSelfPath()).append(" {\n")
+        sb.append(buildSelfPath()).append("{")
+        var first = true
         fields.forEach {
-            sb.append("\t${convertKey(it.key)}: ${it.value};\n")
+            if (!first){
+                sb.append(";")
+            }
+            first=false
+            sb.append("${convertKey(it.key)}:${it.value}")
         }
-        sb.append("}\n")
+        sb.append("}")
     }
 
     internal fun convertKey(key: String): String {
         val out = StringBuilder()
         for (i in 0..key.length - 1) {
             val c = key[i]
-            val l = c.toLowerCase()
+            val l = c.lowercaseChar()
             if (c == l)
                 out.append(c)
             else {
@@ -135,12 +140,12 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
 private val current = ThreadLocal<CSSDef>()
 
 inline fun <T, R> ThreadLocal<T>.swap(value: T, f: () -> R): R {
-    val oldValud = get()
+    val oldValue = get()
     set(value)
     try {
         return f()
     } finally {
-        set(oldValud)
+        set(oldValue)
     }
 }
 
