@@ -10,14 +10,14 @@ buildscript {
         maven(url = "https://plugins.gradle.org/m2/")
     }
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.20")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31")
     }
 }
 
 
 allprojects {
     group = "pw.binom.static-css"
-    version = "0.1.28"
+    version = "0.1.29"
 
     repositories {
         mavenLocal()

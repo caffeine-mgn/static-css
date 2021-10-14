@@ -38,6 +38,7 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
     var userSelect by CssProperty("-moz-user-select", "-ms-user-select", "-webkit-user-select")
     var fontFamily by CssProperty()
     var color by CssProperty()
+    var inset by CssProperty()
     var fontSize by CssProperty()
     var fontWeight by CssProperty()
     var opacity by CssProperty()
