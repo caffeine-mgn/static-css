@@ -11,11 +11,11 @@ buildscript {
         mavenLocal()
         mavenCentral()
         maven {
-            url "https://repo.binom.pw/releases"
+            url "https://repo.binom.pw"
         }
     }
     dependencies {
-        classpath("pw.binom.static-css:plugin:0.1.28")
+        classpath("pw.binom.static-css:plugin:0.1.29")
     }
 }
 
