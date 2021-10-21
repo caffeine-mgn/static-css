@@ -27,9 +27,9 @@ open class CssPlugin : Plugin<Project> {
         target.gradle.addListener(object : DependencyResolutionListener {
             override fun beforeResolve(dependencies: ResolvableDependencies) {
                 val config = findRuntimeClasspath(target)
-                config.dependencies.add(target.dependencies.create("org.jetbrains.kotlin:kotlin-stdlib:1.5.20"))
-                config.dependencies.add(target.dependencies.create("pw.binom.static-css:generator:0.1.28"))
-                target.dependencies.add("api", target.dependencies.create("pw.binom.static-css:generator:0.1.28"))
+                config.dependencies.add(target.dependencies.create("org.jetbrains.kotlin:kotlin-stdlib:1.5.31"))
+                config.dependencies.add(target.dependencies.create("pw.binom.static-css:generator:0.1.29"))
+                target.dependencies.add("api", target.dependencies.create("pw.binom.static-css:generator:0.1.29"))
                 target.gradle.removeListener(this)
             }
 
