@@ -18,6 +18,7 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
     var boxShadow by CssProperty()
     var transition by CssProperty()
     var borderBottomColor by CssProperty()
+    var borderColor by CssProperty()
     var background by CssProperty()
     var visibility by CssProperty()
     var animation by CssProperty()
