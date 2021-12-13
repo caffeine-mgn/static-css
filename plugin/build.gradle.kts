@@ -7,10 +7,10 @@ plugins {
 }
 
 dependencies {
-    api("org.jetbrains.kotlin:kotlin-stdlib:1.5.31")
-    api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31")
-    api("org.jetbrains.kotlin:kotlin-compiler-embeddable:1.5.31")
-    api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31")
+    api("org.jetbrains.kotlin:kotlin-stdlib:1.6.0")
+    api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.0")
+    api("org.jetbrains.kotlin:kotlin-compiler-embeddable:1.6.0")
+    api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.0")
     api(gradleApi())
 }
 

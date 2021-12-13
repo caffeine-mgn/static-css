@@ -6,6 +6,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.DependencyResolutionListener
 import org.gradle.api.artifacts.ResolvableDependencies
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -14,7 +15,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 open class CssPlugin : Plugin<Project> {
-
     fun findRuntimeClasspath(target: Project)=
         when {
             "runtime" in target.configurations.names -> target.configurations.getAt("runtime")
@@ -27,9 +27,9 @@ open class CssPlugin : Plugin<Project> {
         target.gradle.addListener(object : DependencyResolutionListener {
             override fun beforeResolve(dependencies: ResolvableDependencies) {
                 val config = findRuntimeClasspath(target)
-                config.dependencies.add(target.dependencies.create("org.jetbrains.kotlin:kotlin-stdlib:1.5.31"))
-                config.dependencies.add(target.dependencies.create("pw.binom.static-css:generator:0.1.29"))
-                target.dependencies.add("api", target.dependencies.create("pw.binom.static-css:generator:0.1.29"))
+                config.dependencies.add(target.dependencies.create("org.jetbrains.kotlin:kotlin-stdlib:1.6.0"))
+                config.dependencies.add(target.dependencies.create("pw.binom.static-css:generator:0.1.30"))
+                target.dependencies.add("api", target.dependencies.create("pw.binom.static-css:generator:0.1.30"))
                 target.gradle.removeListener(this)
             }
 
@@ -52,15 +52,16 @@ open class CssPlugin : Plugin<Project> {
     }
 }
 
-open class GenerateCss : JavaExec() {
+abstract class GenerateCss : JavaExec() {
 
-    @OutputFile
-    val outputCss = project.objects.fileProperty()
+    @get:OutputFile
+    abstract val outputCss:RegularFileProperty
 
     init {
         group = "build"
         mainClass.set("pw.binom.css.GeneratedMain")
         argumentProviders += CommandLineArgumentProvider { arrayListOf(outputCss.asFile.get().absolutePath) }
+        outputCss.set(project.objects.fileProperty())
     }
 
     override fun exec() {
@@ -70,7 +71,7 @@ open class GenerateCss : JavaExec() {
 
 }
 
-open class GenerateMain : DefaultTask() {
+abstract class GenerateMain : DefaultTask() {
     @OutputFile
     val mainFile = project.objects.fileProperty()
 
