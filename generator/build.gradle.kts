@@ -1,8 +1,18 @@
+
+
 plugins {
     kotlin("jvm")
+    `maven-publish`
 }
-apply {
-    plugin(pw.binom.plugins.BinomPublishPlugin::class.java)
-}
+apply<pw.binom.plugins.BinomPublishPlugin>()
 
-apply<pw.binom.plugins.DocsPlugin>()
+publishing {
+    publications {
+        create<MavenPublication>("BinomRepository") {
+            groupId = project.group.toString()
+            artifactId = project.name
+            version = project.version.toString()
+            from(components["java"])
+        }
+    }
+}

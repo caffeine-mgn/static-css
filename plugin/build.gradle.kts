@@ -2,13 +2,10 @@ import pw.binom.Versions.KOTLIN_VERSION
 
 plugins {
     kotlin("jvm")
-//    `maven-publish`
     `java-gradle-plugin`
 }
 
-apply {
-    plugin(pw.binom.plugins.BinomPublishPlugin::class.java)
-}
+apply<pw.binom.plugins.BinomPublishPlugin>()
 
 java.sourceSets["main"].java {
     srcDir(project.buildDir.resolve("gen"))
