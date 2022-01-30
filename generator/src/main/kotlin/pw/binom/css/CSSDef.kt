@@ -5,7 +5,7 @@ import kotlin.reflect.KProperty
 open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSDef?, val then: Boolean) {
     val fields = LinkedHashMap<String, String>()
     val childs = ArrayList<CSSDef>()
-    val extended = ArrayList<CSSDef>()
+    val extended = HashSet<CSSDef>()
 
     var position by CssProperty()
     var left by CssProperty()
@@ -38,6 +38,7 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
     var filter by CssProperty()
     var userSelect by CssProperty("-moz-user-select", "-ms-user-select", "-webkit-user-select")
     var fontFamily by CssProperty()
+    var alignItems by CssProperty()
     var color by CssProperty()
     var inset by CssProperty()
     var fontSize by CssProperty()
@@ -84,6 +85,10 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
         return 0
     }
 
+    fun extend(other: CSSDef) {
+        other.extended += this
+    }
+
     internal open fun buildSelfPath(): String {
         if (parent == null) {
             return (listOf(name) + extended.map { it.name }).joinToString(", ")
@@ -93,6 +98,9 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
         if (!then)
             sb.append(" ")
         sb.append(name)
+        extended.forEach {
+            sb.append(" ").append(it.name)
+        }
         return sb.toString()
     }
 
@@ -106,10 +114,10 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
         sb.append(buildSelfPath()).append("{")
         var first = true
         fields.forEach {
-            if (!first){
+            if (!first) {
                 sb.append(";")
             }
-            first=false
+            first = false
             sb.append("${convertKey(it.key)}:${it.value}")
         }
         sb.append("}")

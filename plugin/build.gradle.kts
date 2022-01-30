@@ -1,9 +1,17 @@
-import java.net.URI
+import pw.binom.Versions.KOTLIN_VERSION
 
 plugins {
     kotlin("jvm")
-    `maven-publish`
+//    `maven-publish`
     `java-gradle-plugin`
+}
+
+apply {
+    plugin(pw.binom.plugins.BinomPublishPlugin::class.java)
+}
+
+java.sourceSets["main"].java {
+    srcDir(project.buildDir.resolve("gen"))
 }
 
 dependencies {
@@ -14,50 +22,24 @@ dependencies {
     api(gradleApi())
 }
 
-val BINOM_REPO_URL = "binom.repo.url"
-val BINOM_REPO_USER = "binom.repo.user"
-val BINOM_REPO_PASSWORD = "binom.repo.password"
+tasks {
+    val generateVersion = create("generateVersion") {
+        val sourceDir = project.buildDir.resolve("gen/pw/binom")
+        sourceDir.mkdirs()
+        val versionSource = sourceDir.resolve("version.kt")
+        outputs.files(versionSource)
+        inputs.property("version", project.version)
 
-if (hasProperty(BINOM_REPO_URL) && hasProperty(BINOM_REPO_USER) && hasProperty(BINOM_REPO_PASSWORD)) {
-    publishing {
-        repositories {
-            maven {
-                name = "BinomRepository"
-                url = URI(property(BINOM_REPO_URL) as String)
-                credentials {
-                    username = property(BINOM_REPO_USER) as String
-                    password = property(BINOM_REPO_PASSWORD) as String
-                }
-            }
-        }
-        publications {
-            create<MavenPublication>("BinomRepository") {
-                groupId = project.group.toString()
-                artifactId = project.name
-                version = project.version.toString()
-                from(components["java"])
-
-                pom {
-                    scm {
-                        connection.set("https://github.com/caffeine-mgn/static-css.git")
-                        url.set("https://github.com/caffeine-mgn/static-css")
-                    }
-                    developers {
-                        developer {
-                            id.set("subochev")
-                            name.set("Anton Subochev")
-                            email.set("caffeine.mgn@gmail.com")
-                        }
-                    }
-                    licenses {
-                        license {
-                            name.set("The Apache License, Version 2.0")
-                            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                        }
-                    }
-                }
-            }
-        }
+        versionSource.writeText(
+            """package pw.binom
+            
+const val STATIC_CSS_VERSION = "${project.version}"
+const val KOTLIN_VERSION = "$KOTLIN_VERSION"
+"""
+        )
+    }
+    val classes by getting {
+        dependsOn(generateVersion)
     }
 }
 
@@ -70,3 +52,4 @@ gradlePlugin {
         }
     }
 }
+apply<pw.binom.plugins.DocsPlugin>()
