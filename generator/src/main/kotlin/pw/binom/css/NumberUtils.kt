@@ -10,13 +10,13 @@ val Double.px: String
     get() = "${this}px"
 
 val Int.percent: String
-    get() = "${this}%"
+    get() = "$this%"
 
 val Float.percent: String
-    get() = "${this}%"
+    get() = "$this%"
 
 val Double.percent: String
-    get() = "${this}%"
+    get() = "$this%"
 
 fun rgb(r: Double, g: Double, b: Double): String = "rgb($r,$g,$b)"
 fun rgba(r: Double, g: Double, b: Double, a: Double) = "rgba($r,$g,$b,$a)"
@@ -40,4 +40,29 @@ val relative
 
 fun CSSDef.paddingPx(top: Float, right: Float, bottom: Float, left: Float) {
     padding = "${top.px} ${right.px} ${bottom.px} ${left.px}"
+}
+
+object Display {
+    val flex = "flex"
+    val none = "none"
+    val block = "block"
+    val empty = ""
+}
+
+object Flex {
+    object JustifyContent {
+        val flexStart = "flex-start"
+        val flexEnd = "flex-end"
+        val center = "center"
+        val spaceBetween = "space-between"
+        val spaceAround = "space-around"
+    }
+
+    object Align {
+        val flexStart = "flex-start"
+        val flexEnd = "flex-end"
+        val center = "center"
+        val stretch = "stretch"
+        val baseline = "baseline"
+    }
 }

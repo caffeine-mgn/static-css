@@ -13,13 +13,8 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
     var top by CssProperty()
     var bottom by CssProperty()
     var display by CssProperty()
-    var backgroundColor by CssProperty()
-    var borderBottom by CssProperty()
     var boxShadow by CssProperty()
     var transition by CssProperty()
-    var borderBottomColor by CssProperty()
-    var borderColor by CssProperty()
-    var background by CssProperty()
     var visibility by CssProperty()
     var animation by CssProperty()
     var margin by CssProperty()
@@ -27,7 +22,6 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
     var marginLeft by CssProperty()
     var marginTop by CssProperty()
     var marginBottom by CssProperty()
-    var borderRadius by CssProperty()
     var width by CssProperty()
     var height by CssProperty()
     var textDecoration by CssProperty()
@@ -38,7 +32,6 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
     var filter by CssProperty()
     var userSelect by CssProperty("-moz-user-select", "-ms-user-select", "-webkit-user-select")
     var fontFamily by CssProperty()
-    var alignItems by CssProperty()
     var color by CssProperty()
     var inset by CssProperty()
     var fontSize by CssProperty()
@@ -46,9 +39,28 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
     var opacity by CssProperty()
     var verticalAlign by CssProperty()
     var textAlign by CssProperty()
+    var backgroundColor by CssProperty()
+    var background by CssProperty()
     var backgroundRepeat by CssProperty()
     var backgroundPosition by CssProperty()
+    var backgroundImage by CssProperty()
+    var backgroundClip by CssProperty()
+    var backgroundOrigin by CssProperty()
+    var backgroundSize by CssProperty()
+    var backgroundAttachment by CssProperty()
+    var backgroundPositionX by CssProperty()
+    var backgroundPositionY by CssProperty()
     var border by CssProperty()
+    var borderTopColor by CssProperty()
+    var borderRightColor by CssProperty()
+    var borderLeftColor by CssProperty()
+    var borderBottomColor by CssProperty()
+    var borderTop by CssProperty()
+    var borderRight by CssProperty()
+    var borderLeft by CssProperty()
+    var borderBottom by CssProperty()
+    var borderRadius by CssProperty()
+    var borderColor by CssProperty()
     var outline by CssProperty()
     var maxHeight by CssProperty()
     var padding by CssProperty()
@@ -68,6 +80,18 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
     var fill by CssProperty()
     var stroke by CssProperty()
     var strokeWidth by CssProperty()
+    var flexDirection by CssProperty()
+    var justifyContent by CssProperty()
+    var alignSelf by CssProperty()
+    var flexBasis by CssProperty()
+    var alignItems by CssProperty()
+    var flexGrow by CssProperty()
+    var flexShrink by CssProperty()
+    var flex by CssProperty()
+    var animationName by CssProperty("-moz-animation-name", "-webkit-animation-name")
+    var animationDuration by CssProperty("-moz-animation-duration", "-webkit-animation-duration")
+    var animationIterationCount by CssProperty("-moz-animation-iteration-count", "-webkit-animation-iteration-count")
+    var animationDirection by CssProperty("-moz-animation-direction", "-webkit-animation-direction")
 
     init {
         extends.forEach {
@@ -95,8 +119,9 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
         }
 
         val sb = StringBuilder(parent!!.buildSelfPath())
-        if (!then)
+        if (!then) {
             sb.append(" ")
+        }
         sb.append(name)
         extended.forEach {
             sb.append(" ").append(it.name)
@@ -128,9 +153,9 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
         for (i in 0..key.length - 1) {
             val c = key[i]
             val l = c.lowercaseChar()
-            if (c == l)
+            if (c == l) {
                 out.append(c)
-            else {
+            } else {
                 out.append("-").append(l)
             }
         }

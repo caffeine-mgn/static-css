@@ -1,5 +1,6 @@
 package pw.binom.plugins
 
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
@@ -15,7 +16,7 @@ const val BINOM_REPO_PASSWORD = "binom.repo.password"
 
 private fun Project.propertyOrNull(property: String) =
     if (hasProperty(property)) property(property) as String else null
-
+val isMac = Os.isFamily(Os.FAMILY_MAC)
 class BinomPublishPlugin : Plugin<Project> {
     private val logger = Logger.getLogger(this::class.java.name)
     override fun apply(target: Project) {
@@ -55,7 +56,7 @@ class BinomPublishPlugin : Plugin<Project> {
         val publishing = target.extensions.findByName("publishing") as PublishingExtension
         publishing.repositories {
             it.maven {
-                it.name = "BinomRepository"
+                it.name = "Binom"
                 it.url = URI(target.property(BINOM_REPO_URL) as String)
                 it.credentials {
                     it.username = target.property(BINOM_REPO_USER) as String
@@ -78,19 +79,14 @@ class BinomPublishPlugin : Plugin<Project> {
             }
         }
 
-//        if (signApply) {
-//            target.extensions.configure(SigningExtension::class.java) {
-//                it.useInMemoryPgpKeys(gpgKeyId, gpgPrivateKey, gpgPassword)
-//                it.sign(publishing.publications)
-//            }
-//        } else {
-//            logger.warning("gpg configuration missing. Jar will be publish without sign")
-//        }
         publishing.publications.withType(MavenPublication::class.java) {
             it.pom {
+                it.name.set(PublishInfo.NAME)
+                it.url.set(PublishInfo.HTTP_PATH_TO_PROJECT)
+                it.description.set(PublishInfo.DESCRIPTION)
                 it.scm {
-                    it.connection.set("https://github.com/caffeine-mgn/pw.binom.io.git")
-                    it.url.set("https://github.com/caffeine-mgn/pw.binom.io")
+                    it.connection.set(PublishInfo.GIT_PATH_TO_PROJECT)
+                    it.url.set(PublishInfo.HTTP_PATH_TO_PROJECT)
                 }
                 it.developers {
                     it.developer {
@@ -108,20 +104,37 @@ class BinomPublishPlugin : Plugin<Project> {
             }
         }
         if (signApply) {
-            println("Try configure GPG key for sign")
             target.extensions.configure(SigningExtension::class.java) {
-                println("Configuring GPG key...")
                 it.useInMemoryPgpKeys(gpgKeyId, gpgPrivateKey, gpgPassword)
                 it.sign(publishing.publications)
-                println("Publications configured with GPG key!")
                 it.setRequired(target.tasks.filterIsInstance<PublishToMavenRepository>())
-                println("Publications:")
-                publishing.publications.forEach {
-                    println("=>${it.name}")
-                }
             }
         } else {
             logger.warning("gpg configuration missing. Jar will be publish without sign")
         }
+        target.tasks.withType(PublishToMavenRepository::class.java) {
+            it.enabled = isPublicationSupport(it.publication?.name)
+        }
     }
+
+    private fun isPublicationSupport(publicationName: String?): Boolean =
+        if (isMac && publicationName != null) {
+            when (publicationName) {
+                "macosX64",
+                "macosArm64",
+                "ios",
+                "iosArm32",
+                "iosArm64",
+                "iosSimulatorArm64",
+                "watchos",
+                "watchosArm32",
+                "watchosArm64",
+                "watchosSimulatorArm64",
+                "watchosX64",
+                "watchosX86" -> true
+                else -> false
+            }
+        } else {
+            true
+        }
 }

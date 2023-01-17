@@ -3,7 +3,6 @@ package pw.binom.css
 class AnimationBuilder(val name: String) {
     internal val animations = ArrayList<AnimCSSDef>()
 
-
     operator fun Int.invoke(function: CSSDef.() -> Unit) {
         on(persent = this, function)
     }
