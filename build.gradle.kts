@@ -1,12 +1,12 @@
-import pw.binom.getGitBranch
+import pw.binom.publish.getExternalVersion
+
+plugins {
+    id("pw.binom.publish") version "0.1.12" apply false
+}
 
 allprojects {
     group = "pw.binom.static-css"
-    val branch = getGitBranch()
-    version = if (branch == "main" || branch == "master")
-        pw.binom.Versions.LIB_VERSION
-    else
-        "${pw.binom.Versions.LIB_VERSION}-SNAPSHOT"
+    version = getExternalVersion()
 
     repositories {
         mavenLocal()
