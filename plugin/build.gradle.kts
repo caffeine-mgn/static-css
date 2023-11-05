@@ -15,10 +15,10 @@ java.sourceSets["main"].java {
 }
 
 dependencies {
-    api("org.jetbrains.kotlin:kotlin-stdlib:1.8.21")
-    api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.21")
-    api("org.jetbrains.kotlin:kotlin-compiler-embeddable:1.8.21")
-    api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.21")
+    api("org.jetbrains.kotlin:kotlin-stdlib:1.9.20")
+    api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20")
+    api("org.jetbrains.kotlin:kotlin-compiler-embeddable:1.9.20")
+    api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20")
     api(gradleApi())
 }
 

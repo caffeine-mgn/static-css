@@ -1,11 +1,6 @@
 package pw.binom
 
 object Versions {
-    val LIB_VERSION = "0.1.33"
-//    val TEST_CONTAINERS_VERSION = "0.1.2"
-    val KOTLIN_VERSION = "1.8.21"
-//    val KOTLINX_SERIALIZATION_VERSION = "1.3.1"
-//    val KOTLINX_COROUTINES_VERSION = "1.5.1-new-mm-dev2"
-//    val KOTLINX_COROUTINES_VERSION = "1.6.0"
-//    val KOTLINX_COROUTINES_VERSION = "1.5.2"
+    val LIB_VERSION = "0.1.34"
+    val KOTLIN_VERSION = "1.9.20"
 }

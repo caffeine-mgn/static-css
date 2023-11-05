@@ -25,7 +25,7 @@ open class CssPlugin : Plugin<Project> {
         }
 
     override fun apply(target: Project) {
-        target.pluginManager.apply("kotlin-platform-jvm")
+        target.pluginManager.apply("org.jetbrains.kotlin.jvm")
         target.gradle.addListener(object : DependencyResolutionListener {
             override fun beforeResolve(dependencies: ResolvableDependencies) {
                 val config = findRuntimeClasspath(target)
