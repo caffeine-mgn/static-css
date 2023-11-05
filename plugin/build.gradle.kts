@@ -47,7 +47,7 @@ gradlePlugin {
     this.isAutomatedPublishing = false
     plugins {
         create("static-css") {
-            id = "static-css"
+            id = "pw.binom.static-css"
             displayName = "Static-Css Plugin"
             implementationClass = "pw.binom.css.CssPlugin"
             description = "Binom Static Css Library"
