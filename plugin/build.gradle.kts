@@ -6,9 +6,8 @@ plugins {
     `java-gradle-plugin`
     `maven-publish`
     id("com.gradle.plugin-publish").version("0.20.0")
+    id("pw.binom.publish")
 }
-
-apply<pw.binom.plugins.BinomPublishPlugin>()
 
 java.sourceSets["main"].java {
     srcDir(project.buildDir.resolve("gen"))

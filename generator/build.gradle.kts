@@ -3,8 +3,8 @@
 plugins {
     kotlin("jvm")
     `maven-publish`
+    id("pw.binom.publish")
 }
-apply<pw.binom.plugins.BinomPublishPlugin>()
 
 publishing {
     publications {
