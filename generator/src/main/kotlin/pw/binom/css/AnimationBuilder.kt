@@ -11,7 +11,7 @@ class AnimationBuilder(val name: String) {
         val d = AnimCSSDef(
             name = "$persent%",
             parent = null,
-            then = false
+            then = false,
         )
         func(d)
         animations += d

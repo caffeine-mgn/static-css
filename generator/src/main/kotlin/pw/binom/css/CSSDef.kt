@@ -3,7 +3,7 @@ package pw.binom.css
 import kotlin.reflect.KProperty
 
 open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSDef?, val then: Boolean) {
-    val fields = LinkedHashMap<String, String>()
+    val fields = LinkedHashMap<String, List<String>>()
     val childs = ArrayList<CSSDef>()
     val extended = HashSet<CSSDef>()
 
@@ -94,6 +94,14 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
     var animationIterationCount by CssProperty("-moz-animation-iteration-count", "-webkit-animation-iteration-count")
     var animationDirection by CssProperty("-moz-animation-direction", "-webkit-animation-direction")
 
+    fun field(key: String, value: String) {
+        fields[key] = listOf(value)
+    }
+
+    fun field(key: String, vararg values: String) {
+        fields[key] = values.toList()
+    }
+
     init {
         extends.forEach {
             it.extended += this
@@ -139,12 +147,14 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
         }
         sb.append(buildSelfPath()).append("{")
         var first = true
-        fields.forEach {
+        fields.forEach { (key, values) ->
             if (!first) {
                 sb.append(";")
             }
             first = false
-            sb.append("${convertKey(it.key)}:${it.value}")
+            values.forEach { value ->
+                sb.append("${convertKey(key)}:$value")
+            }
         }
         sb.append("}")
     }
@@ -197,7 +207,7 @@ fun style(name: String, extends: Array<out CSSDef>, then: Boolean = false, f: CS
 
 class CssProperty(vararg val also: String, val wrap: Char? = null) {
     operator fun getValue(thisRef: CSSDef, property: KProperty<*>): String? {
-        val value = thisRef.fields[property.name] ?: return null
+        val value = thisRef.fields[property.name]?.firstOrNull() ?: return null
         return if (wrap != null) {
             val sb = StringBuilder()
             var i = 1
@@ -236,9 +246,9 @@ class CssProperty(vararg val also: String, val wrap: Char? = null) {
             } else {
                 value
             }
-            thisRef.fields[property.name] = resultValue
+            thisRef.fields[property.name] = listOf(resultValue)
             also.forEach {
-                thisRef.fields[it] = resultValue
+                thisRef.fields[it] = listOf(resultValue)
             }
         }
     }
