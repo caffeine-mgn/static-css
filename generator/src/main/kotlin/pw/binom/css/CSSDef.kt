@@ -148,11 +148,11 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
         sb.append(buildSelfPath()).append("{")
         var first = true
         fields.forEach { (key, values) ->
-            if (!first) {
-                sb.append(";")
-            }
-            first = false
             values.forEach { value ->
+                if (!first) {
+                    sb.append(";")
+                }
+                first = false
                 sb.append("${convertKey(key)}:$value")
             }
         }
