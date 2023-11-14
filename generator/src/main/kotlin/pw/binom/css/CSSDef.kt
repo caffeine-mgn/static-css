@@ -88,6 +88,7 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
     var flexGrow by CssProperty()
     var flexShrink by CssProperty()
     var flex by CssProperty()
+    var boxSizing by CssProperty()
     var animationName by CssProperty("-moz-animation-name", "-webkit-animation-name")
     var animationDuration by CssProperty("-moz-animation-duration", "-webkit-animation-duration")
     var animationIterationCount by CssProperty("-moz-animation-iteration-count", "-webkit-animation-iteration-count")
