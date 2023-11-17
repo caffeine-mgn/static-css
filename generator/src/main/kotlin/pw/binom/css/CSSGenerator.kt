@@ -41,6 +41,13 @@ open class CSSBlock {
         return this
     }
 
+    fun add(vararg block: CSSBlock): CSSBlock {
+        block.forEach {
+            add(it)
+        }
+        return this
+    }
+
     fun add(block: CSSBlock): CSSBlock {
         csses += block.csses
         keyframes += block.keyframes

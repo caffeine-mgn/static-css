@@ -14,7 +14,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath("pw.binom.static-css:plugin:0.1.38")
+        classpath("pw.binom.static-css:plugin:0.1.39")
     }
 }
 

@@ -86,6 +86,7 @@ open class CSSDef(
     var stroke by CssProperty()
     var strokeWidth by CssProperty()
     var flexDirection by CssProperty()
+    var flexWrap by CssProperty()
     var justifyContent by CssProperty()
     var alignSelf by CssProperty()
     var flexBasis by CssProperty()
