@@ -1,8 +1,8 @@
 package pw.binom.css
 
 object CSS {
-    operator fun invoke(function: CSSDefinition): CSSBlock {
-        val block = CSSBlock()
+    operator fun invoke(function: RootCSSDef.() -> Unit): CSSBlock {
+        val block = RootCSSDef()
         block.function()
         return block
     }
@@ -15,17 +15,18 @@ typealias CSSDefinition = CSSBlock.() -> Unit
 
 fun CSSDefinition(func: CSSDefinition): CSSDefinition = func
 
-class CSSBlock {
+open class CSSBlock {
     private val csses = LinkedHashSet<CSSDef>()
     private val keyframes = LinkedHashSet<AnimationBuilder>()
+
     operator fun String.invoke(vararg extends: CSSDef, function: CSSDef.() -> Unit): CSSDef {
         val style = style(name = this, extends = extends, then = false, f = function)
         csses += style
         return style
     }
 
-    fun buildRecursive(output: Appendable) {
-        csses.forEach { it.buildRecursive(output, false) }
+    open fun buildRecursive(output: Appendable) {
+        csses.forEach { it.buildRecursive(output, keyframes = false, media = false) }
         keyframes.forEach { it.build(output) }
     }
 

@@ -2,7 +2,12 @@ package pw.binom.css
 
 import kotlin.reflect.KProperty
 
-open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSDef?, val then: Boolean) {
+open class CSSDef(
+    val name: String,
+    extends: Array<out CSSDef>,
+    var parent: CSSDef?,
+    val then: Boolean,
+) {
     val fields = LinkedHashMap<String, List<String>>()
     val childs = ArrayList<CSSDef>()
     val extended = HashSet<CSSDef>()
@@ -109,12 +114,12 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
     }
 
     operator fun String.compareTo(f: CSSDef.() -> Unit): Int {
-        style(this, extends = emptyArray(), true, f)
+        style(this, extends = emptyArray(), true, f = f)
         return 0
     }
 
     operator fun String.invoke(vararg extends: CSSDef, f: CSSDef.() -> Unit): Int {
-        style(this, extends = extends, then = false, f)
+        style(this, extends = extends, then = false, f = f)
         return 0
     }
 
@@ -138,12 +143,19 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
         return sb.toString()
     }
 
-    internal open fun buildSelf(sb: Appendable, keyframes: Boolean) {
+    internal open fun buildSelf(
+        sb: Appendable,
+        keyframes: Boolean,
+        media: Boolean,
+    ) {
         if (fields.isEmpty()) {
             return
         }
         if (keyframes) {
             sb.append("@keyframes ")
+        }
+        if (media) {
+            sb.append("@media")
         }
         sb.append(buildSelfPath()).append("{")
         var first = true
@@ -173,11 +185,11 @@ open class CSSDef(val name: String, extends: Array<out CSSDef>, var parent: CSSD
         return out.toString()
     }
 
-    internal open fun buildRecursive(sb: Appendable, keyframes: Boolean) {
-        buildSelf(sb, keyframes)
+    internal open fun buildRecursive(sb: Appendable, keyframes: Boolean, media: Boolean) {
+        buildSelf(sb = sb, keyframes = keyframes, media = media)
         if (childs.isNotEmpty()) {
             childs.forEach {
-                it.buildRecursive(sb, keyframes)
+                it.buildRecursive(sb = sb, keyframes = keyframes, media = media)
             }
         }
     }
@@ -195,8 +207,18 @@ inline fun <T, R> ThreadLocal<T>.swap(value: T, f: () -> R): R {
     }
 }
 
-fun style(name: String, extends: Array<out CSSDef>, then: Boolean = false, f: CSSDef.() -> Unit): CSSDef {
-    val def = CSSDef(name = name, extends = extends, parent = current.get(), then = then)
+fun style(
+    name: String,
+    extends: Array<out CSSDef>,
+    then: Boolean = false,
+    f: CSSDef.() -> Unit,
+): CSSDef {
+    val def = CSSDef(
+        name = name,
+        extends = extends,
+        parent = current.get(),
+        then = then,
+    )
     current.get()?.childs?.let { it.add(def) }
     current.swap(def) {
         def.f()

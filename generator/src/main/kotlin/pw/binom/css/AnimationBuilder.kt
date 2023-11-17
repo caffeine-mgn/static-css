@@ -20,7 +20,7 @@ class AnimationBuilder(val name: String) {
     internal fun build(out: Appendable) {
         out.append("@keyframes ").append(name).append("{")
         animations.forEach {
-            it.buildRecursive(out, false)
+            it.buildRecursive(out, keyframes = false, media = false)
         }
         out.append("}")
     }

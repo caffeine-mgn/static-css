@@ -14,7 +14,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath("pw.binom.static-css:plugin:0.1.30")
+        classpath("pw.binom.static-css:plugin:0.1.38")
     }
 }
 
@@ -31,6 +31,11 @@ buildCss {
 package pw.binom.css
 
 val style = CSS {
+    media("screen and (max-width: 992px)") {
+        "body" {
+            backgroundColor="#CCC"
+        }
+    }
     "bigPlayButton" {
         position = "absolute"
         left = "50%"
