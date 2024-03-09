@@ -19,6 +19,7 @@ import pw.binom.STATIC_CSS_VERSION
 open class CssPlugin : Plugin<Project> {
     fun findRuntimeClasspath(target: Project) =
         when {
+            "api" in target.configurations.names -> target.configurations.getAt("implementation")
             "runtime" in target.configurations.names -> target.configurations.getAt("runtime")
             "runtimeClasspath" in target.configurations.names -> target.configurations.getAt("runtimeClasspath")
             else -> throw GradleException("Can't find runtime configuration")
@@ -26,21 +27,28 @@ open class CssPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         target.pluginManager.apply("org.jetbrains.kotlin.jvm")
-        target.gradle.addListener(object : DependencyResolutionListener {
-            override fun beforeResolve(dependencies: ResolvableDependencies) {
-                val config = findRuntimeClasspath(target)
-                config.dependencies.add(target.dependencies.create("org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"))
-                config.dependencies.add(target.dependencies.create("pw.binom.static-css:generator:$STATIC_CSS_VERSION"))
-                target.dependencies.add(
-                    "api",
-                    target.dependencies.create("pw.binom.static-css:generator:$STATIC_CSS_VERSION")
-                )
-                target.gradle.removeListener(this)
+        val cssApi =
+            target.configurations.create("cssApi") {
+                it.isCanBeResolved = true
+                it.extendsFrom(target.configurations.getAt("api"))
             }
+        target.gradle.addListener(
+            object : DependencyResolutionListener {
+                override fun beforeResolve(dependencies: ResolvableDependencies) {
+                    val config = cssApi // findRuntimeClasspath(target)
+                    config.dependencies.add(target.dependencies.create("org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"))
+                    config.dependencies.add(target.dependencies.create("pw.binom.static-css:generator:$STATIC_CSS_VERSION"))
+                    target.dependencies.add(
+                        "api",
+                        target.dependencies.create("pw.binom.static-css:generator:$STATIC_CSS_VERSION"),
+                    )
+                    target.gradle.removeListener(this)
+                }
 
-            override fun afterResolve(dependencies: ResolvableDependencies) {
-            }
-        })
+                override fun afterResolve(dependencies: ResolvableDependencies) {
+                }
+            },
+        )
         val generateMainTask = target.tasks.register("generateCssMainSource", GenerateMain::class.java)
         val compileKotlin = target.tasks.findByName("compileKotlin") as KotlinCompile
         compileKotlin.dependsOn(generateMainTask.get())
@@ -51,13 +59,12 @@ open class CssPlugin : Plugin<Project> {
         val generateCss = target.tasks.register("buildCss", GenerateCss::class.java)
         generateCss.get().dependsOn(compileKotlin)
         generateCss.get().outputCss.set(target.buildDir.resolve("css/${target.name}.css"))
-        val runtimeClasspath = findRuntimeClasspath(target)
+        val runtimeClasspath = cssApi // findRuntimeClasspath(target)
         generateCss.get().classpath = compileKotlin.outputs.files + runtimeClasspath
     }
 }
 
 abstract class GenerateCss : JavaExec() {
-
     @get:OutputFile
     abstract val outputCss: RegularFileProperty
 
