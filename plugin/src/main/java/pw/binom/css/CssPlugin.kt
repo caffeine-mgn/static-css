@@ -13,8 +13,8 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.process.CommandLineArgumentProvider
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import pw.binom.KOTLIN_VERSION
-import pw.binom.STATIC_CSS_VERSION
+import pw.binom.css.BuildConfig.KOTLIN_VERSION
+import pw.binom.css.BuildConfig.STATIC_CSS_VERSION
 
 open class CssPlugin : Plugin<Project> {
     fun findRuntimeClasspath(target: Project) =

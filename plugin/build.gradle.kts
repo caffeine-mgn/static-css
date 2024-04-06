@@ -7,11 +7,18 @@ plugins {
     `maven-publish`
     id("com.gradle.plugin-publish").version("0.20.0")
     id("pw.binom.publish")
+    id("com.github.gmazzo.buildconfig")
 }
 
-java.sourceSets["main"].java {
-    srcDir(project.buildDir.resolve("gen"))
+buildConfig {
+    packageName("pw.binom.css")
+    buildConfigField("String", "KOTLIN_VERSION", "\"$KOTLIN_VERSION\"")
+    buildConfigField("String", "STATIC_CSS_VERSION", "\"${project.version}\"")
 }
+
+//java.sourceSets["main"].java {
+//    srcDir(project.buildDir.resolve("gen"))
+//}
 
 dependencies {
     api("org.jetbrains.kotlin:kotlin-stdlib:1.9.20")
@@ -20,7 +27,7 @@ dependencies {
     api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20")
     api(gradleApi())
 }
-
+/*
 tasks {
     val generateVersion = create("generateVersion") {
         val sourceDir = project.buildDir.resolve("gen/pw/binom")
@@ -41,7 +48,7 @@ const val KOTLIN_VERSION = "$KOTLIN_VERSION"
         dependsOn(generateVersion)
     }
 }
-
+*/
 gradlePlugin {
     this.isAutomatedPublishing = false
     plugins {
@@ -71,4 +78,4 @@ publishing {
     }
 }
 
-apply<pw.binom.plugins.DocsPlugin>()
+//apply<pw.binom.plugins.DocsPlugin>()

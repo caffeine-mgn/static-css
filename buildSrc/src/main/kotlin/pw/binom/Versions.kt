@@ -1,5 +1,7 @@
 package pw.binom
 
+import pw.binom.css.BuildConfig
+
 object Versions {
-    val KOTLIN_VERSION = "1.9.20"
+    val KOTLIN_VERSION = BuildConfig.KOTLIN_VERSION
 }
