@@ -50,7 +50,6 @@ const val KOTLIN_VERSION = "$KOTLIN_VERSION"
 }
 */
 gradlePlugin {
-    this.isAutomatedPublishing = false
     plugins {
         create("static-css") {
             id = "pw.binom.static-css"
